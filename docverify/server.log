@@ -1,0 +1,33 @@
+Watching for file changes with StatReloader
+[17/Sep/2026 14:26:13] "GET / HTTP/1.1" 200 4242
+[17/Sep/2026 14:26:24] "GET / HTTP/1.1" 200 4242
+[17/Sep/2026 14:26:24] "GET /static/verification/css/style.css HTTP/1.1" 200 13593
+[17/Sep/2026 14:26:24] "GET /static/verification/js/upload-preview.js HTTP/1.1" 200 2250
+Not Found: /favicon.ico
+[17/Sep/2026 14:26:24] "GET /favicon.ico HTTP/1.1" 404 3665
+[17/Sep/2026 14:26:59] "GET /verify/ HTTP/1.1" 200 3527
+pdf2image failed during forgery analysis (Unable to get page count. Is poppler installed and in PATH?) - is poppler installed?
+[17/Sep/2026 14:27:17] "POST /verify/ HTTP/1.1" 200 2593
+[17/Sep/2026 14:27:17] "GET /static/verification/css/style.css HTTP/1.1" 304 0
+[17/Sep/2026 14:27:17] "GET /static/verification/js/upload-preview.js HTTP/1.1" 304 0
+[17/Sep/2026 14:27:27] "GET / HTTP/1.1" 200 4242
+[17/Sep/2026 14:27:33] "GET /accounts/login/ HTTP/1.1" 200 2576
+[17/Sep/2026 14:28:12] "POST /accounts/login/ HTTP/1.1" 302 0
+[17/Sep/2026 14:28:12] "GET /dashboard/ HTTP/1.1" 200 2829
+[17/Sep/2026 14:28:15] "GET /register/ HTTP/1.1" 200 3997
+[17/Sep/2026 14:28:15] "GET /static/verification/js/upload-preview.js HTTP/1.1" 304 0
+pdf2image failed (Unable to get page count. Is poppler installed and in PATH?) - is poppler installed?
+pdf2image failed during forgery analysis (Unable to get page count. Is poppler installed and in PATH?) - is poppler installed?
+[17/Sep/2026 14:28:27] "POST /register/ HTTP/1.1" 302 0
+[17/Sep/2026 14:28:27] "GET /document/fd2e29ca-198c-43c2-89e8-fb9dabe1186c/ HTTP/1.1" 200 4752
+[17/Sep/2026 14:28:27] "GET /static/verification/css/style.css HTTP/1.1" 304 0
+[17/Sep/2026 14:28:41] "GET /verify/ HTTP/1.1" 200 4020
+[17/Sep/2026 14:28:45] "POST /verify/ HTTP/1.1" 200 3182
+[17/Sep/2026 14:28:52] "GET /register/ HTTP/1.1" 200 3997
+[17/Sep/2026 14:28:54] "GET /dashboard/ HTTP/1.1" 200 3687
+[17/Sep/2026 14:28:58] "GET / HTTP/1.1" 200 4736
+[17/Sep/2026 14:29:03] "GET /verify/ HTTP/1.1" 200 4020
+[17/Sep/2026 14:29:04] "GET /register/ HTTP/1.1" 200 3997
+[17/Sep/2026 14:29:06] "GET /dashboard/ HTTP/1.1" 200 3687
+[17/Sep/2026 14:29:09] "POST /accounts/logout/ HTTP/1.1" 302 0
+[17/Sep/2026 14:29:09] "GET / HTTP/1.1" 200 4242

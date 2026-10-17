@@ -1,0 +1,55 @@
+{% extends 'verification/base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>Your Dashboard</h1>
+    <p>Documents you've registered and their current status.</p>
+</section>
+
+<section class="stat-strip">
+    <div class="stat-card"><span class="stat-value">{{ stats.total }}</span><span class="stat-label">Total</span></div>
+    <div class="stat-card"><span class="stat-value">{{ stats.registered }}</span><span class="stat-label">Registered</span></div>
+    <div class="stat-card"><span class="stat-value">{{ stats.revoked }}</span><span class="stat-label">Revoked</span></div>
+    <div class="stat-card"><span class="stat-value">{{ stats.flagged }}</span><span class="stat-label">Flagged</span></div>
+    <div class="stat-card"><span class="stat-value">{{ stats.failed }}</span><span class="stat-label">Failed</span></div>
+</section>
+
+<section class="panel">
+    {% if documents %}
+        <table class="doc-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Forgery Score</th>
+                    <th>Registered</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for document in documents %}
+                <tr>
+                    <td>{{ document.title|default:document.original_filename }}</td>
+                    <td>{{ document.get_document_type_display }}</td>
+                    <td><span class="badge badge-status status-{{ document.status }}">{{ document.get_status_display }}</span></td>
+                    <td>
+                        {% if document.forgery_score is not None %}
+                            {{ document.forgery_score|floatformat:2 }}
+                            {% if document.is_suspected_forged %}<span class="badge badge-warning">flagged</span>{% endif %}
+                        {% else %}&mdash;{% endif %}
+                    </td>
+                    <td>{{ document.registered_at|default:"—" }}</td>
+                    <td><a href="{% url 'document_detail' doc_uuid=document.uuid %}" class="button button-sm button-ghost">View</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="text-muted">You haven't registered any documents yet.</p>
+        <a href="{% url 'register_document' %}" class="button button-primary">Register your first document</a>
+    {% endif %}
+</section>
+{% endblock %}

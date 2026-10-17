@@ -1,0 +1,80 @@
+{% extends 'verification/base.html' %}
+
+{% block title %}Register a Document{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>Register a Document</h1>
+    <p>Upload a certificate, marksheet or legal document to notarize its fingerprint on the blockchain.</p>
+</section>
+
+{% if show_warning %}
+<section class="panel panel-warning">
+    <h2>&#128680; Possible tampering detected</h2>
+    <p>
+        Our forgery detector flagged <strong>{{ document.original_filename }}</strong>
+        with a risk score of <strong>{{ document.forgery_score|floatformat:2 }}</strong> (0 = clean, 1 = high risk).
+        Review the reasons below before deciding whether to proceed.
+    </p>
+    <ul class="flag-list">
+        {% for flag in flags %}
+            <li>{{ flag }}</li>
+        {% empty %}
+            <li>No specific reasons were recorded.</li>
+        {% endfor %}
+    </ul>
+
+    <form method="post" action="{% url 'register_document' %}" class="warning-actions">
+        {% csrf_token %}
+        <input type="hidden" name="document_uuid" value="{{ document.uuid }}">
+        <label class="checkbox-row">
+            <input type="checkbox" name="confirm_forgery" value="1" required>
+            I have reviewed the forgery report and want to register this document anyway.
+        </label>
+        <div class="form-actions">
+            <button type="submit" name="action" value="confirm" class="button button-primary">Register Anyway</button>
+            <button type="submit" name="action" value="cancel" class="button button-ghost" formnovalidate>Cancel &amp; Discard Upload</button>
+        </div>
+    </form>
+</section>
+
+{% else %}
+<section class="panel">
+    <form method="post" enctype="multipart/form-data" class="upload-form" id="upload-form">
+        {% csrf_token %}
+
+        <div class="dropzone" id="dropzone">
+            <p class="dropzone-hint">Drag &amp; drop a file here, or click to browse</p>
+            <p class="dropzone-filename" id="dropzone-filename"></p>
+            {{ form.file }}
+        </div>
+        {% if form.file.errors %}<p class="field-error">{{ form.file.errors|striptags }}</p>{% endif %}
+
+        <div class="form-row">
+            <label for="{{ form.title.id_for_label }}">Title</label>
+            {{ form.title }}
+            {% if form.title.errors %}<p class="field-error">{{ form.title.errors|striptags }}</p>{% endif %}
+        </div>
+
+        <div class="form-row">
+            <label for="{{ form.document_type.id_for_label }}">Document type</label>
+            {{ form.document_type }}
+            {% if form.document_type.errors %}<p class="field-error">{{ form.document_type.errors|striptags }}</p>{% endif %}
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="button button-primary">Analyze &amp; Register</button>
+        </div>
+    </form>
+</section>
+
+<section class="panel panel-muted">
+    <h2>What happens next</h2>
+    <ol class="mini-steps">
+        <li>We extract the text with OCR and run ELA, copy-move and metadata forgery checks.</li>
+        <li>If the document looks clean, its SHA-256 hash is written to the blockchain immediately.</li>
+        <li>If it looks suspicious, you'll see the forgery report first and can choose to proceed or cancel.</li>
+    </ol>
+</section>
+{% endif %}
+{% endblock %}

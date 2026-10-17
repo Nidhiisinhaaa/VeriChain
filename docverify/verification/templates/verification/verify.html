@@ -1,0 +1,48 @@
+{% extends 'verification/base.html' %}
+
+{% block title %}Verify a Document{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>Verify a Document</h1>
+    <p>Check whether a document is a genuine, unaltered, non-revoked record on the blockchain.</p>
+</section>
+
+<section class="panel">
+    <div class="tabs">
+        <button type="button" class="tab-button {% if active_tab != 'hash' %}active{% endif %}" data-tab="file">Upload File</button>
+        <button type="button" class="tab-button {% if active_tab == 'hash' %}active{% endif %}" data-tab="hash">Paste Hash</button>
+    </div>
+
+    <div class="tab-panel {% if active_tab != 'hash' %}active{% endif %}" data-tab-panel="file">
+        <form method="post" enctype="multipart/form-data" class="upload-form">
+            {% csrf_token %}
+            <input type="hidden" name="mode" value="file">
+            <div class="dropzone" id="dropzone">
+                <p class="dropzone-hint">Drag &amp; drop the document to verify, or click to browse</p>
+                <p class="dropzone-filename" id="dropzone-filename"></p>
+                {{ file_form.file }}
+            </div>
+            {% if file_form.file.errors %}<p class="field-error">{{ file_form.file.errors|striptags }}</p>{% endif %}
+            <div class="form-actions">
+                <button type="submit" class="button button-primary">Verify File</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="tab-panel {% if active_tab == 'hash' %}active{% endif %}" data-tab-panel="hash">
+        <form method="post" class="hash-form">
+            {% csrf_token %}
+            <input type="hidden" name="mode" value="hash">
+            <div class="form-row">
+                <label for="{{ hash_form.hash.id_for_label }}">{{ hash_form.hash.label }}</label>
+                {{ hash_form.hash }}
+                {% if hash_form.hash.errors %}<p class="field-error">{{ hash_form.hash.errors|striptags }}</p>{% endif %}
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="button button-primary">Verify Hash</button>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

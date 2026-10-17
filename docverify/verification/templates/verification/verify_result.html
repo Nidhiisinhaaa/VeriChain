@@ -1,0 +1,71 @@
+{% extends 'verification/base.html' %}
+
+{% block title %}Verification Result{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>Verification Result</h1>
+</section>
+
+<section class="panel result-panel result-{{ result.result_code }}">
+    {% if result.result_code == 'valid' %}
+        <div class="result-badge">&#9989; Verified</div>
+        <p class="result-summary">This document is authentic, unmodified, and currently valid on the blockchain.</p>
+    {% elif result.result_code == 'revoked' %}
+        <div class="result-badge">&#9888;&#65039; Revoked</div>
+        <p class="result-summary">This document matches a registered record, but it has since been revoked by its issuer.</p>
+    {% elif result.result_code == 'tampered' %}
+        <div class="result-badge">&#128680; Possibly Tampered</div>
+        <p class="result-summary">No blockchain record matches this exact file, and our forgery detector flagged it as likely edited. This may be a modified copy of a genuine document.</p>
+    {% else %}
+        <div class="result-badge">&#10060; Not Found</div>
+        <p class="result-summary">No blockchain record matches this document's fingerprint. It may never have been registered, or it may have been altered since registration.</p>
+    {% endif %}
+
+    <dl class="result-facts">
+        <div><dt>Fingerprint (SHA-256)</dt><dd class="mono">{{ result.doc_hash }}</dd></div>
+        {% if result.uploaded_filename %}
+            <div><dt>File checked</dt><dd>{{ result.uploaded_filename }}</dd></div>
+        {% endif %}
+        {% if result.chain_error %}
+            <div><dt>Blockchain status</dt><dd class="text-muted">Live chain check unavailable ({{ result.chain_error }}). Showing our last known local record instead.</dd></div>
+        {% endif %}
+    </dl>
+
+    {% if result.chain_info and result.chain_info.registered %}
+        <div class="result-facts">
+            <h3>On-chain record</h3>
+            <dl>
+                <div><dt>Issuer address</dt><dd class="mono">{{ result.chain_info.issuer }}</dd></div>
+                <div><dt>Document type</dt><dd>{{ result.chain_info.document_type }}</dd></div>
+                <div><dt>Registered at (unix)</dt><dd>{{ result.chain_info.timestamp }}</dd></div>
+                <div><dt>Revoked</dt><dd>{{ result.chain_info.revoked|yesno:"Yes,No" }}</dd></div>
+            </dl>
+        </div>
+    {% endif %}
+
+    {% if result.forgery_report %}
+        <div class="result-facts">
+            <h3>Forgery analysis of the file you uploaded</h3>
+            <p>Risk score: <strong>{{ result.forgery_report.score|floatformat:2 }}</strong> / 1.00</p>
+            {% if result.forgery_report.flags %}
+                <ul class="flag-list">
+                    {% for flag in result.forgery_report.flags %}<li>{{ flag }}</li>{% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">No forgery indicators found.</p>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {% if result.local_doc %}
+        <div class="form-actions">
+            <a href="{% url 'document_detail' doc_uuid=result.local_doc.uuid %}" class="button button-secondary">View Full Record</a>
+        </div>
+    {% endif %}
+</section>
+
+<div class="form-actions">
+    <a href="{% url 'verify_document' %}" class="button button-ghost">Verify Another Document</a>
+</div>
+{% endblock %}

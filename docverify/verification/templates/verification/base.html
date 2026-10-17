@@ -1,0 +1,60 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}VeriChain{% endblock %} — Document Verification</title>
+    <link rel="stylesheet" href="{% static 'verification/css/style.css' %}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="{% url 'home' %}">
+                <span class="brand-mark">&#128274;</span>
+                <span class="brand-name">VeriChain</span>
+            </a>
+            <nav class="site-nav">
+                <a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a>
+                <a href="{% url 'verify_document' %}" class="{% if request.resolver_match.url_name == 'verify_document' %}active{% endif %}">Verify a Document</a>
+                {% if user.is_authenticated and user.is_staff %}
+                    <a href="{% url 'register_document' %}" class="{% if request.resolver_match.url_name == 'register_document' %}active{% endif %}">Register</a>
+                    <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Dashboard</a>
+                {% endif %}
+            </nav>
+            <div class="header-auth">
+                {% if user.is_authenticated %}
+                    <span class="auth-user">{{ user.username }}{% if user.is_staff %} <span class="badge badge-issuer">Issuer</span>{% endif %}</span>
+                    <form action="{% url 'logout' %}" method="post" class="inline-form">
+                        {% csrf_token %}
+                        <button type="submit" class="link-button">Log out</button>
+                    </form>
+                {% else %}
+                    <a class="button button-ghost button-sm" href="{% url 'login' %}">Issuer Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    {% if messages %}
+        <div class="container messages">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <main class="container page-main">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <p>VeriChain — tamper-proof document verification, secured on-chain. Only a document's hash is ever stored; the file itself never leaves your device unless you choose to register it.</p>
+        </div>
+    </footer>
+
+    <script src="{% static 'verification/js/upload-preview.js' %}"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

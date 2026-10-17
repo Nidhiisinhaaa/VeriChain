@@ -1,0 +1,76 @@
+{% extends 'verification/base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <h1>Verify any certificate in seconds.<br>Trust the chain, not the paper.</h1>
+    <p class="hero-sub">
+        VeriChain lets institutions notarize academic certificates, marksheets and
+        legal documents on the Ethereum blockchain, and lets anyone confirm a
+        document is genuine, unaltered and still valid — instantly.
+    </p>
+    <div class="hero-actions">
+        <a href="{% url 'verify_document' %}" class="button button-primary">Verify a Document</a>
+        {% if user.is_authenticated and user.is_staff %}
+            <a href="{% url 'register_document' %}" class="button button-secondary">Register a Document</a>
+        {% else %}
+            <a href="{% url 'login' %}" class="button button-secondary">Issuer Login</a>
+        {% endif %}
+    </div>
+</section>
+
+<section class="stat-strip">
+    <div class="stat-card">
+        <span class="stat-value">{{ stats.total_registered }}</span>
+        <span class="stat-label">Documents registered</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-value">{{ stats.total_verifications }}</span>
+        <span class="stat-label">Verifications performed</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-value">{{ stats.total_revoked }}</span>
+        <span class="stat-label">Documents revoked</span>
+    </div>
+</section>
+
+<section class="how-it-works">
+    <h2>How it works</h2>
+    <div class="steps">
+        <div class="step">
+            <span class="step-number">1</span>
+            <h3>An institution registers a document</h3>
+            <p>An issuer uploads a certificate. VeriChain reads it with OCR, runs
+            an AI forgery check, then computes its SHA-256 fingerprint and writes
+            <em>only that fingerprint</em> to the blockchain — never the file itself.</p>
+        </div>
+        <div class="step">
+            <span class="step-number">2</span>
+            <h3>Anyone can verify it</h3>
+            <p>A verifier — an employer, a university, anyone — re-uploads the
+            same document, or pastes its hash directly. VeriChain re-computes the
+            fingerprint and checks it against the blockchain record.</p>
+        </div>
+        <div class="step">
+            <span class="step-number">3</span>
+            <h3>The result is unambiguous</h3>
+            <p>Because a single changed byte produces a completely different hash,
+            an authentic, unmodified document always matches. Anything edited,
+            forged, or never registered does not — and revoked documents are
+            flagged too.</p>
+        </div>
+    </div>
+</section>
+
+<section class="privacy-note">
+    <h2>Privacy by design</h2>
+    <p>
+        The blockchain never sees your document — only its SHA-256 hash, a
+        one-way fingerprint that cannot be reversed back into the original file.
+        Institutions keep custody of the documents they issue; the chain only
+        proves that a specific fingerprint was registered by a specific issuer
+        at a specific time, and whether it has since been revoked.
+    </p>
+</section>
+{% endblock %}

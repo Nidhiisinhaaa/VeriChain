@@ -1,0 +1,94 @@
+{% extends 'verification/base.html' %}
+
+{% block title %}{{ document.title|default:document.original_filename }}{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>{{ document.title|default:document.original_filename }}</h1>
+    <p>
+        <span class="badge badge-status status-{{ document.status }}">{{ document.get_status_display }}</span>
+        {% if document.is_suspected_forged %}<span class="badge badge-warning">Flagged for review</span>{% endif %}
+    </p>
+</section>
+
+<section class="panel">
+    <h2>Record</h2>
+    <dl class="result-facts">
+        <div><dt>Document type</dt><dd>{{ document.get_document_type_display }}</dd></div>
+        <div><dt>Original filename</dt><dd>{{ document.original_filename }}</dd></div>
+        <div><dt>SHA-256 fingerprint</dt><dd class="mono">{{ document.sha256_hash }}</dd></div>
+        <div><dt>Uploaded by</dt><dd>{{ document.owner.username }}</dd></div>
+        <div><dt>Uploaded at</dt><dd>{{ document.created_at }}</dd></div>
+        {% if document.registered_at %}<div><dt>Registered at</dt><dd>{{ document.registered_at }}</dd></div>{% endif %}
+    </dl>
+</section>
+
+<section class="panel">
+    <h2>Blockchain record</h2>
+    {% if document.status == 'pending' %}
+        <p class="text-muted">This document has not been sent to the blockchain yet.</p>
+    {% elif document.status == 'failed' %}
+        <p class="text-warning">The last blockchain registration attempt failed.</p>
+        {% if can_manage %}
+            <form method="post" action="{% url 'retry_registration' doc_uuid=document.uuid %}">
+                {% csrf_token %}
+                <button type="submit" class="button button-primary">Retry Registration</button>
+            </form>
+        {% endif %}
+    {% else %}
+        <dl class="result-facts">
+            <div><dt>Transaction hash</dt><dd class="mono">{{ document.tx_hash }}</dd></div>
+            <div><dt>Block number</dt><dd>{{ document.block_number }}</dd></div>
+            <div><dt>Block explorer</dt><dd>
+                <a href="#" class="text-muted" title="Point this at your chain's explorer, e.g. Etherscan for a public network">
+                    View on block explorer (placeholder — configure for your target chain)
+                </a>
+            </dd></div>
+        </dl>
+
+        {% if chain_error %}
+            <p class="text-muted">Live chain re-check unavailable right now ({{ chain_error }}). Showing the last known local record above.</p>
+        {% elif chain_info %}
+            <dl class="result-facts">
+                <div><dt>Currently valid on-chain</dt><dd>{{ chain_info.is_valid|yesno:"Yes,No" }}</dd></div>
+                <div><dt>Issuer address</dt><dd class="mono">{{ chain_info.issuer }}</dd></div>
+                <div><dt>Revoked</dt><dd>{{ chain_info.revoked|yesno:"Yes,No" }}</dd></div>
+            </dl>
+        {% endif %}
+
+        {% if can_manage and document.status == 'registered' %}
+            <form method="post" action="{% url 'revoke_document' doc_uuid=document.uuid %}" onsubmit="return confirm('Revoke this document? This cannot be undone.');">
+                {% csrf_token %}
+                <button type="submit" class="button button-danger">Revoke Document</button>
+            </form>
+        {% endif %}
+    {% endif %}
+</section>
+
+<section class="panel">
+    <h2>Forgery analysis</h2>
+    {% if document.forgery_score is not None %}
+        <p>Risk score: <strong>{{ document.forgery_score|floatformat:2 }}</strong> / 1.00
+            {% if document.is_suspected_forged %}<span class="text-warning">(above suspicion threshold)</span>{% endif %}
+        </p>
+        {% if flags %}
+            <ul class="flag-list">
+                {% for flag in flags %}<li>{{ flag }}</li>{% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-muted">No forgery indicators found at registration time.</p>
+        {% endif %}
+    {% else %}
+        <p class="text-muted">No forgery analysis on record.</p>
+    {% endif %}
+</section>
+
+<section class="panel">
+    <h2>Extracted text (OCR)</h2>
+    {% if document.extracted_text %}
+        <pre class="ocr-text">{{ document.extracted_text }}</pre>
+    {% else %}
+        <p class="text-muted">No text could be extracted from this document.</p>
+    {% endif %}
+</section>
+{% endblock %}
