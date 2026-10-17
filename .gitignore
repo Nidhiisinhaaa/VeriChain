@@ -1,0 +1,12 @@
+
+# Python virtual environments
+venv/
+.venv/
+docverify/venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Environment variables
+.env
